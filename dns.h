@@ -1,9 +1,9 @@
 #pragma once
 
+#include <iostream>
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "helper.h"
 
@@ -28,22 +28,22 @@ enum class SectionType : uint16_t {
 };
 
 struct DnsHeader {
-  uint16_t ID;
+  uint16_t id;
   uint16_t flags;
   uint16_t qd_count;
   uint16_t an_count;
-  uint16_t NSCOUNT;
-  uint16_t ARCOUNT;
+  uint16_t ns_count;
+  uint16_t ar_count;
 };
 
 struct DnsQuestion {
-  std::string name;
+  std::vector<std::string> lables;
   SectionType type;
   SectionClass qclass;
 };
 
 struct DnsSection {
-  std::string name;
+  std::vector<std::string> lables;
   SectionType type;
   SectionClass sclass;
   uint32_t ttl; // cache interval
@@ -55,7 +55,8 @@ struct DnsSection {
 void push_chars(std::vector<uint8_t> &bytes, const char *chars, const int len);
 template <class T> void rpush_bytes(std::vector<uint8_t> &bytes, const T &obj);
 
-class DnsPacket {
+// Only supports basic querries
+class DnsPacketTcp {
 
   uint16_t length;
   DnsHeader header;
@@ -64,18 +65,18 @@ class DnsPacket {
   std::vector<DnsSection> authorities;
   std::vector<DnsSection> additionals;
 
-  DnsPacket() {
+  DnsPacketTcp() : length{0}, header{}, questions{}, answers{}, authorities{}, additionals{} {
   }
 
   inline static bool is_name_pointer(const uint8_t val);
-  static void parse_name(std::string &name, const uint8_t **cur, const uint8_t *data);
+  static void parse_name(std::vector<std::string> &name, const uint8_t **cur, const uint8_t *data);
   static DnsSection parse_section(const uint8_t **cur, const uint8_t *data);
   static DnsQuestion parse_question(const uint8_t **cur, const uint8_t *data);
 
 public:
-  static DnsPacket deserialize(const uint8_t *data);
-  void serialize(std::vector<uint8_t> &data) const;
+  static DnsPacketTcp url_querry_packet(const uint16_t id, const std::string &url);
 
+  static DnsPacketTcp deserialize(const uint8_t *data);
+  std::vector<uint8_t> serialize() const;
   std::string to_string() const;
 };
-

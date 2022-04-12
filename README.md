@@ -1,3 +1,3 @@
 # Dns protocol (POC)
 
-  - dns protocol implemented in c++
+  - dns protocol in c++
