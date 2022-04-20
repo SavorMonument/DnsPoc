@@ -57,7 +57,7 @@ template <class T> void rpush_bytes(std::vector<uint8_t> &bytes, const T &obj);
 
 // Only supports basic querries
 class DnsPacketTcp {
-
+  // The length field is only used for tcp connections and does not count towards offsets
   uint16_t length;
   DnsHeader header;
   std::vector<DnsQuestion> questions;
@@ -80,3 +80,4 @@ public:
   std::vector<uint8_t> serialize() const;
   std::string to_string() const;
 };
+
